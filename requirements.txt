@@ -13,5 +13,5 @@ yt-dlp
 moviepy
 gTTS
 googletrans==4.0.0-rc1
-openai
+openai>=1.0.0
 pillow
