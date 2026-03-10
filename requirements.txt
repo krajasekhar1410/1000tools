@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+Jinja2
+python-multipart
+pandas
+openpyxl
+lxml
+python-docx
+reportlab
+img2pdf
+pdf2docx
+yt-dlp
+moviepy
+gTTS
+googletrans==4.0.0-rc1
+openai
+pillow
