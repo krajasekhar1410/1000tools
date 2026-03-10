@@ -1,0 +1,155 @@
+{
+    "categories": [
+        {
+            "name": "Data & File Converters",
+            "icon": "RefreshCw",
+            "slug": "data-converters",
+            "tools": [
+                {
+                    "name": "CSV to XML",
+                    "slug": "csv-to-xml",
+                    "description": "Quickly convert CSV data files into structured XML format."
+                },
+                {
+                    "name": "Excel to XML",
+                    "slug": "xlsx-to-xml",
+                    "description": "Convert XLSX spreadsheets to XML for data interoperability."
+                },
+                {
+                    "name": "JSON to CSV",
+                    "slug": "json-to-csv",
+                    "description": "Turn nested JSON objects into simple CSV rows."
+                },
+                {
+                    "name": "XML to JSON",
+                    "slug": "xml-to-json",
+                    "description": "Convert XML documents into readable JSON format."
+                },
+                {
+                    "name": "JPG to PNG",
+                    "slug": "jpg-to-png",
+                    "description": "Standardize image formats with transparency support."
+                },
+                {
+                    "name": "PDF to Word",
+                    "slug": "pdf-to-word",
+                    "description": "Restore editable text from static PDF files."
+                }
+            ]
+        },
+        {
+            "name": "AI Productivity Tools 🚀",
+            "icon": "Zap",
+            "slug": "ai-tools",
+            "tools": [
+                {
+                    "name": "AI Image Generator",
+                    "slug": "ai-image-gen",
+                    "description": "Turn descriptive text into high-resolution artistic images (DALL-E 3)."
+                },
+                {
+                    "name": "AI Text Paraphraser",
+                    "slug": "ai-paraphraser",
+                    "description": "Rewrite any text to improve clarity, tone, and flow."
+                },
+                {
+                    "name": "AI Summarizer",
+                    "slug": "ai-summarizer",
+                    "description": "Instantly extract key bullet points from long articles and reports."
+                },
+                {
+                    "name": "AI Grammar Fixer",
+                    "slug": "ai-grammar",
+                    "description": "Elite-level spelling and syntax correction using AI."
+                }
+            ]
+        },
+        {
+            "name": "YouTube & Video Suite 🎥",
+            "icon": "Youtube",
+            "slug": "video-suite",
+            "tools": [
+                {
+                    "name": "YouTube Video Extractor",
+                    "slug": "yt-downloader",
+                    "description": "Paste a link to download video or extract high-quality audio."
+                },
+                {
+                    "name": "Video Transcriber",
+                    "slug": "video-transcribe",
+                    "description": "Convert video speech to perfect text in 50+ languages."
+                },
+                {
+                    "name": "Audio-Video Merger",
+                    "slug": "av-merger",
+                    "description": "Merge separate audio and video files into one professional MP4."
+                },
+                {
+                    "name": "Video Translator",
+                    "slug": "video-translate",
+                    "description": "Automatically translate transcriptions to any language."
+                }
+            ]
+        },
+        {
+            "name": "Smart Calculators",
+            "icon": "Calculator",
+            "slug": "calculators",
+            "tools": [
+                {
+                    "name": "EMI Calculator",
+                    "slug": "emi-calculator",
+                    "description": "Calculate loan monthly payments, interest, and total cost."
+                },
+                {
+                    "name": "Age Calculator",
+                    "slug": "age-calculator",
+                    "description": "Find exact age down to months and days with birthdate."
+                },
+                {
+                    "name": "BMI Calculator",
+                    "slug": "bmi-calculator",
+                    "description": "Check Body Mass Index and health range instantly."
+                }
+            ]
+        },
+        {
+            "name": "SEO & Growth",
+            "icon": "TrendingUp",
+            "slug": "seo-growth",
+            "tools": [
+                {
+                    "name": "Keyword Generator",
+                    "slug": "kw-generator",
+                    "description": "Discover high-volume search terms for your niche."
+                },
+                {
+                    "name": "Meta Tag Generator",
+                    "slug": "meta-gen",
+                    "description": "Perfectly optimized titles and descriptions for Google."
+                }
+            ]
+        },
+        {
+            "name": "Affiliate Recommendations",
+            "icon": "Star",
+            "slug": "affiliate",
+            "tools": [
+                {
+                    "name": "Canva",
+                    "slug": "aff-canva",
+                    "description": "The best tool for social media and graphic design.",
+                    "isAffiliate": true,
+                    "url": "https://canva.com"
+                },
+                {
+                    "name": "Notion",
+                    "slug": "aff-notion",
+                    "description": "Unified workspace for docks, notes, and projects.",
+                    "isAffiliate": true,
+                    "url": "https://notion.so"
+                }
+            ]
+        }
+    ]
+}

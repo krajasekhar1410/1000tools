@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or "1000Tools | Ultimate Digital Utility Hub" }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#d9e2ff',
+                            200: '#bccaff',
+                            300: '#8da6ff',
+                            400: '#5876ff',
+                            500: '#2b3ffc',
+                            600: '#1b22f2',
+                            700: '#1417db',
+                            800: '#1517b1',
+                            900: '#171a8c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 glass border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <a href="/" class="flex items-center gap-2">
+                        <div class="bg-brand-500 p-2 rounded-xl text-white">
+                            <i data-lucide="wrench" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-2xl font-heading font-bold tracking-tight text-slate-900">1000<span class="text-brand-500">Tools</span></span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex flex-1 max-w-md mx-8">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="h-5 w-5 text-slate-400"></i>
+                        </div>
+                        <input type="text" placeholder="Search 1,000+ tools..." 
+                            class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-full bg-slate-100/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="text-slate-600 hover:text-slate-900 font-medium text-sm">Sign In</button>
+                    <button class="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/20">Go Premium 🚀</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="bg-brand-500 p-1.5 rounded-lg text-white">
+                            <i data-lucide="wrench" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-xl font-heading font-bold text-white">1000Tools</span>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-6">The ultimate all-in-one digital utility hub. High-performance tools for PDF, Images, AI, and development.</p>
+                </div>
+                <div>
+                  <h4 class="text-white font-semibold mb-6">Categories</h4>
+                  <ul class="space-y-4 text-sm">
+                      <li><a href="#" class="hover:text-white transition-colors">PDF Tools</a></li>
+                      <li><a href="#" class="hover:text-white transition-colors">Image Tools</a></li>
+                      <li><a href="#" class="hover:text-white transition-colors">AI Tools</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="text-white font-semibold mb-6">Company</h4>
+                  <ul class="space-y-4 text-sm">
+                      <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                      <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>
+                      <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="text-white font-semibold mb-6">Newsletter</h4>
+                  <p class="text-sm mb-4">Get updates on new tools and AI features.</p>
+                  <div class="flex gap-2">
+                      <input type="email" placeholder="Email" class="bg-slate-800 border-none rounded-lg px-4 py-2 text-sm w-full focus:ring-2 focus:ring-brand-500">
+                      <button class="bg-brand-500 text-white p-2 rounded-lg"><i data-lucide="send" class="w-4 h-4"></i></button>
+                  </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+                <span>&copy; 2026 1000Tools. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

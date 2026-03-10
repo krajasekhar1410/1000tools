@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://unpkg.com/alpinejs" defer></script>
+
+<div class="bg-indigo-50 border-b border-indigo-100 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex text-sm font-medium text-slate-500 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            <a href="/" class="hover:text-brand-500 transition-colors">Home</a>
+            <i data-lucide="chevron-right" class="w-4 h-4 mx-3 text-slate-300"></i>
+            <a href="#" class="hover:text-brand-500 transition-colors">Tools</a>
+            <i data-lucide="chevron-right" class="w-4 h-4 mx-3 text-slate-300"></i>
+            <span class="text-brand-600 truncate">{{ tool.name }}</span>
+        </nav>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-heading font-black text-slate-900 mb-4 tracking-tight">{{ tool.name
+                    }}</h1>
+                <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">{{ tool.description }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button
+                    class="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-brand-500 hover:border-brand-100 transition-all">
+                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                </button>
+                <button
+                    class="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-red-500 hover:border-red-100 transition-all">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Main Tool Area -->
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-[32px] border border-slate-100 shadow-2xl shadow-indigo-500/5 overflow-hidden">
+                <!-- Tool UI Adapter -->
+                <div class="p-8 md:p-12">
+
+                    {% if tool.slug in ['csv-to-xml', 'xlsx-to-xml', 'jpg-to-png', 'png-to-jpg', 'pdf-to-word',
+                    'webp-to-jpg', 'svg-to-png', 'image-to-pdf'] %}
+                    <div x-data="{ 
+                        state: 'idle', 
+                        fileName: '', 
+                        downloadUrl: '', 
+                        error: '',
+                        uploadFile(event) {
+                            const file = event.target.files[0];
+                            if (!file) return;
+                            this.fileName = file.name;
+                            this.state = 'uploading';
+                            this.error = '';
+                            
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            fetch('/api/convert/{{ tool.slug }}', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.download_url) {
+                                    this.downloadUrl = data.download_url;
+                                    this.state = 'done';
+                                } else {
+                                    this.error = data.error || 'Conversion failed';
+                                    this.state = 'idle';
+                                }
+                            })
+                            .catch(err => {
+                                this.error = 'Server error during upload';
+                                this.state = 'idle';
+                            });
+                        }
+                    }" class="space-y-8">
+
+                        <!-- Upload Box -->
+                        <div x-show="state === 'idle'" class="relative group">
+                            <input type="file" @change="uploadFile"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <div
+                                class="h-64 border-4 border-dashed border-slate-200 rounded-[40px] flex flex-col items-center justify-center bg-slate-50 group-hover:bg-indigo-50/50 group-hover:border-brand-500 transition-all duration-500">
+                                <div
+                                    class="bg-white p-6 rounded-3xl shadow-xl shadow-indigo-500/10 mb-6 text-brand-500 group-hover:scale-110 transition-transform">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10"></i>
+                                </div>
+                                <h3 class="text-xl font-heading font-black text-slate-900 mb-2">Drop your file here</h3>
+                                <p class="text-slate-400 font-medium">or click to browse from device</p>
+                            </div>
+                        </div>
+
+                        <!-- Processing State -->
+                        <div x-show="state === 'uploading'"
+                            class="h-64 bg-slate-900 rounded-[40px] flex flex-col items-center justify-center p-8 animate-pulse">
+                            <div class="relative w-20 h-20 mb-6">
+                                <div class="absolute inset-0 border-4 border-brand-500/20 rounded-full"></div>
+                                <div
+                                    class="absolute inset-0 border-4 border-brand-500 rounded-full border-t-transparent animate-spin">
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-heading font-black text-white mb-2">Processing...</h3>
+                            <p class="text-indigo-300 text-sm font-mono" x-text="fileName"></p>
+                        </div>
+
+                        <!-- Success State -->
+                        <div x-show="state === 'done'"
+                            class="bg-emerald-500 p-12 rounded-[40px] text-white text-center shadow-2xl shadow-emerald-500/20">
+                            <div
+                                class="bg-white/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="check-circle" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="text-3xl font-heading font-black mb-2">Conversion Complete!</h3>
+                            <p class="text-emerald-100 mb-10" x-text="fileName"></p>
+                            <a :href="downloadUrl"
+                                class="inline-flex items-center gap-3 bg-white text-emerald-600 px-10 py-5 rounded-3xl font-black text-lg shadow-xl hover:scale-105 transition-all">
+                                <i data-lucide="download" class="w-6 h-6"></i>
+                                Download Result
+                            </a>
+                            <button @click="state = 'idle'; downloadUrl = ''"
+                                class="block mx-auto mt-8 text-emerald-100 text-sm font-bold hover:text-white underline">Convert
+                                Another File</button>
+                        </div>
+
+                        <template x-if="error">
+                            <div
+                                class="p-6 bg-red-50 border border-red-100 text-red-600 rounded-3xl flex items-center gap-4">
+                                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                                <span class="font-bold" x-text="error"></span>
+                            </div>
+                        </template>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug == 'word-counter' %}
+                    <div x-data="{ 
+                        text: '', 
+                        stats: {words: 0, characters: 0},
+                        async updateStats() {
+                            const res = await fetch('/api/tools/word-counter', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({text: this.text})
+                            });
+                            this.stats = await res.json();
+                        }
+                    }">
+                        <textarea x-model="text" @input="updateStats()" placeholder="Paste your text here..."
+                            class="w-full h-80 p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl focus:outline-none focus:ring-4 focus:ring-indigo-50/50 focus:border-brand-500 transition-all text-lg leading-relaxed placeholder:text-slate-300"></textarea>
+
+                        <div class="grid grid-cols-2 gap-6 mt-8">
+                            <div class="bg-indigo-50 p-6 rounded-3xl text-center">
+                                <span class="block text-4xl font-heading font-black text-brand-600"
+                                    x-text="stats.words">0</span>
+                                <span
+                                    class="text-sm font-bold text-slate-500 uppercase tracking-widest mt-2 block">Words</span>
+                            </div>
+                            <div class="bg-brand-50 p-6 rounded-3xl text-center">
+                                <span class="block text-4xl font-heading font-black text-brand-500"
+                                    x-text="stats.characters">0</span>
+                                <span
+                                    class="text-sm font-bold text-slate-500 uppercase tracking-widest mt-2 block">Characters</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug == 'json-formatter' %}
+                    <div x-data="{ 
+                        input: '', 
+                        output: '', 
+                        error: '',
+                        async format() {
+                            this.error = '';
+                            const res = await fetch('/api/tools/json-formatter', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({json: this.input})
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                                this.output = data.formatted;
+                            } else {
+                                this.error = data.error;
+                            }
+                        },
+                        copy() {
+                            navigator.clipboard.writeText(this.output);
+                            alert('Copied to clipboard!');
+                        }
+                    }">
+                        <div class="space-y-6">
+                            <div class="relative">
+                                <textarea x-model="input" placeholder="Paste unformatted JSON..."
+                                    class="w-full h-64 p-6 bg-slate-900 text-indigo-100 font-mono text-sm rounded-3xl focus:outline-none focus:ring-4 focus:ring-brand-500/20 transition-all"></textarea>
+                                <div class="absolute bottom-4 right-4 flex gap-2">
+                                    <button @click="format()"
+                                        class="bg-brand-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-600 transition-all flex items-center gap-2">
+                                        <i data-lucide="zap" class="w-4 h-4"></i> Format
+                                    </button>
+                                </div>
+                            </div>
+
+                            <template x-if="error">
+                                <div class="p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100"
+                                    x-text="'Error: ' + error"></div>
+                            </template>
+
+                            <div x-show="output" class="relative animate-in slide-in-from-top-4 duration-500">
+                                <textarea x-model="output" readonly
+                                    class="w-full h-64 p-6 bg-slate-50 border border-slate-200 text-slate-700 font-mono text-sm rounded-3xl"></textarea>
+                                <button @click="copy()"
+                                    class="absolute top-4 right-4 bg-white border border-slate-200 p-2 rounded-xl text-slate-400 hover:text-brand-500 shadow-sm transition-all">
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug == 'ai-image-gen' %}
+                    <div x-data="{ 
+                        prompt: '', 
+                        imageUrl: '', 
+                        loading: false, 
+                        error: '',
+                        async generate() {
+                            this.loading = true; this.error = ''; this.imageUrl = '';
+                            const res = await fetch('/api/tools/ai-image-gen', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({prompt: this.prompt})
+                            });
+                            const data = await res.json();
+                            if (res.ok) this.imageUrl = data.image_url; else this.error = data.error;
+                            this.loading = false;
+                        }
+                    }" class="space-y-8">
+                        <div class="relative">
+                            <input x-model="prompt" placeholder="Describe the image you want..."
+                                class="w-full p-6 bg-slate-50 border-2 border-slate-200 rounded-3xl focus:border-brand-500 transition-all text-lg mb-4">
+                            <button @click="generate()" :disabled="loading"
+                                class="w-full bg-brand-500 text-white p-6 rounded-3xl font-black text-xl shadow-xl hover:bg-brand-600 transition-all flex items-center justify-center gap-4">
+                                <span x-show="!loading">Generate Masterpiece 🎨</span>
+                                <span x-show="loading" class="animate-spin text-2xl">⏳</span>
+                                <span x-show="loading">Creating your art...</span>
+                            </button>
+                        </div>
+                        <div x-show="imageUrl" class="mt-8">
+                            <img :src="imageUrl" class="w-full rounded-[40px] shadow-2xl border-8 border-white">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug == 'yt-downloader' %}
+                    <div x-data="{ url: '', downloadUrl: '', state: 'idle', error: '',
+                        async extract() {
+                            this.state = 'processing'; this.error = '';
+                            const res = await fetch('/api/tools/yt-downloader', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({url: this.url})
+                            });
+                            const data = await res.json();
+                            if (res.ok) { this.downloadUrl = data.download_url; this.state = 'done'; } else { this.error = data.error; this.state = 'idle'; }
+                        }
+                    }" class="space-y-8">
+                        <input x-model="url" placeholder="Paste YouTube URL..."
+                            class="w-full p-6 bg-slate-50 border-2 border-slate-200 rounded-3xl focus:border-brand-500 transition-all text-lg">
+                        <button @click="extract()" :disabled="state === 'processing'"
+                            class="w-full bg-slate-900 text-white p-6 rounded-3xl font-black text-xl hover:bg-brand-600 transition-all shadow-xl">
+                            <span x-show="state !== 'processing'">Download Video 🎥</span>
+                            <span x-show="state === 'processing'">Extracting...</span>
+                        </button>
+                        <div x-show="state === 'done'"
+                            class="bg-emerald-500 p-10 rounded-[40px] text-white text-center">
+                            <h3 class="text-2xl font-black mb-6">Extraction Successful!</h3>
+                            <a :href="downloadUrl"
+                                class="inline-flex items-center gap-3 bg-white text-emerald-600 px-10 py-4 rounded-2xl font-black shadow-xl">Download
+                                MP4</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug in ['emi-calculator', 'bmi-calculator'] %}
+                    <div x-data="{ 
+                        tool: '{{ tool.slug }}', 
+                        params: {}, 
+                        result: null,
+                        async calculate() {
+                            const res = await fetch('/api/tools/calculators', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({tool: this.tool, params: this.params})
+                            });
+                            const data = await res.json();
+                            this.result = data.result;
+                        }
+                    }" class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% if tool.slug == 'emi-calculator' %}
+                            <div><label class="block text-sm font-bold mb-2">Loan Amount</label><input type="number"
+                                    x-model="params.principal" class="w-full p-4 bg-slate-50 border rounded-2xl"></div>
+                            <div><label class="block text-sm font-bold mb-2">Interest Rate (%)</label><input
+                                    type="number" x-model="params.rate"
+                                    class="w-full p-4 bg-slate-50 border rounded-2xl"></div>
+                            <div><label class="block text-sm font-bold mb-2">Tenure (Months)</label><input type="number"
+                                    x-model="params.tenure" class="w-full p-4 bg-slate-50 border rounded-2xl"></div>
+                            {% endif %}
+                            {% if tool.slug == 'bmi-calculator' %}
+                            <div><label class="block text-sm font-bold mb-2">Weight (kg)</label><input type="number"
+                                    x-model="params.weight" class="w-full p-4 bg-slate-50 border rounded-2xl"></div>
+                            <div><label class="block text-sm font-bold mb-2">Height (cm)</label><input type="number"
+                                    x-model="params.height" class="w-full p-4 bg-slate-50 border rounded-2xl"></div>
+                            {% endif %}
+                        </div>
+                        <button @click="calculate()"
+                            class="w-full bg-brand-500 text-white p-6 rounded-3xl font-black text-xl shadow-xl">Calculate
+                            Now</button>
+                        <div x-show="result !== null" class="bg-indigo-50 p-8 rounded-3xl text-center">
+                            <span class="text-sm font-bold text-slate-500 uppercase tracking-widest block mb-2">Your
+                                Result</span>
+                            <span class="text-5xl font-heading font-black text-brand-600" x-text="result"></span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug in ['ai-summarizer', 'ai-paraphraser', 'ai-grammar'] %}
+                    <div x-data="{ 
+                        text: '', 
+                        result: '', 
+                        loading: false,
+                        async process() {
+                            this.loading = true;
+                            const res = await fetch('/api/tools/ai-text', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({tool: '{{ tool.slug }}', text: this.text})
+                            });
+                            const data = await res.json();
+                            this.result = data.result;
+                            this.loading = false;
+                        }
+                    }" class="space-y-8">
+                        <textarea x-model="text" placeholder="Paste your text here..."
+                            class="w-full h-64 p-6 bg-slate-50 border-2 rounded-3xl focus:border-brand-500 transition-all"></textarea>
+                        <button @click="process()" :disabled="loading"
+                            class="w-full bg-slate-900 text-white p-6 rounded-3xl font-black text-xl">
+                            <span x-show="!loading">Process with AI ✨</span>
+                            <span x-show="loading" class="animate-spin">⏳</span>
+                        </button>
+                        <div x-show="result"
+                            class="p-8 bg-brand-50 border border-brand-100 rounded-3xl text-slate-700 leading-relaxed"
+                            x-text="result"></div>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.isAffiliate %}
+                    <div class="py-12 text-center bg-amber-50 rounded-[40px] border-4 border-dashed border-amber-200">
+                        <i data-lucide="external-link" class="w-16 h-16 mx-auto mb-6 text-amber-500"></i>
+                        <h2 class="text-3xl font-heading font-black text-slate-900 mb-4">Official Partner Tool</h2>
+                        <p class="text-slate-600 mb-10 max-w-sm mx-auto">We recommend {{ tool.name }} for high-quality
+                            professional results. Click below to visit their official site.</p>
+                        <a href="{{ tool.url }}" target="_blank"
+                            class="px-12 py-5 bg-amber-500 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-amber-600 transition-all inline-block">Visit
+                            {{ tool.name }} 🚀</a>
+                    </div>
+                    {% endif %}
+
+                    {% if tool.slug not in ['word-counter', 'json-formatter', 'csv-to-xml', 'xlsx-to-xml', 'jpg-to-png',
+                    'png-to-jpg', 'pdf-to-word', 'webp-to-jpg', 'svg-to-png', 'image-to-pdf', 'ai-image-gen',
+                    'yt-downloader', 'emi-calculator', 'age-calculator', 'bmi-calculator', 'ai-summarizer',
+                    'ai-paraphraser', 'ai-grammar'] and not tool.isAffiliate %}
+                    <div class="py-20 text-center">
+                        <div
+                            class="bg-indigo-50 p-6 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-8 text-brand-500">
+                            <i data-lucide="construction" class="w-10 h-10"></i>
+                        </div>
+                        <h2 class="text-3xl font-heading font-black text-slate-900 mb-4">Coming Soon!</h2>
+                        <p class="text-slate-500 mb-10 max-w-sm mx-auto">We're putting the finishing touches on this
+                            tool.</p>
+                        <button class="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold">Notify Me</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SEO Content -->
+            <div class="mt-20 prose prose-slate prose-lg max-w-none">
+                <h2 class="text-3xl font-heading font-bold text-slate-900 mb-8">How to use {{ tool.name }}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 not-prose">
+                    <div class="relative pl-12">
+                        <div
+                            class="absolute left-0 top-0 w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 font-black flex items-center justify-center">
+                            1</div>
+                        <h4 class="font-bold text-slate-900 mb-2">Upload or Input</h4>
+                        <p class="text-slate-500 text-sm">Paste your content or click upload to select files from your
+                            computer.</p>
+                    </div>
+                    <div class="relative pl-12">
+                        <div
+                            class="absolute left-0 top-0 w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 font-black flex items-center justify-center">
+                            2</div>
+                        <h4 class="font-bold text-slate-900 mb-2">Processing</h4>
+                        <p class="text-slate-500 text-sm">Wait a split second while our engine processes your request
+                            securely.</p>
+                    </div>
+                    <div class="relative pl-12">
+                        <div
+                            class="absolute left-0 top-0 w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 font-black flex items-center justify-center">
+                            3</div>
+                        <h4 class="font-bold text-slate-900 mb-2">Download</h4>
+                        <p class="text-slate-500 text-sm">Download your result or copy it to your clipboard. No data is
+                            stored long-term.</p>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h3>
+                <div class="space-y-4 not-prose">
+                    <div class="p-6 bg-white border border-slate-100 rounded-2xl">
+                        <h5 class="font-bold text-slate-900 mb-2">Is this tool free?</h5>
+                        <p class="text-slate-500 text-sm italic">Yes, all tools on 1000Tools are free to use. Some
+                            advanced batch processing may require a premium sub later.</p>
+                    </div>
+                    <div class="p-6 bg-white border border-slate-100 rounded-2xl">
+                        <h5 class="font-bold text-slate-900 mb-2">Is my data secure?</h5>
+                        <p class="text-slate-500 text-sm italic">Everything is processed either in your browser or
+                            deleted immediately after processing on our secure servers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-4">
+            <div class="sticky top-24 space-y-8">
+                <div class="bg-brand-500 p-8 rounded-[32px] text-white shadow-2xl shadow-indigo-500/20">
+                    <h4 class="text-2xl font-heading font-black mb-4">Premium Pack</h4>
+                    <p class="text-indigo-100 mb-8 leading-relaxed">Unlock batch processing, 2GB file limits, and 100%
+                        ad-free experience.</p>
+                    <button
+                        class="w-full bg-white text-brand-600 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-[1.02] transition-all">Go
+                        Pro – $5/mo</button>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-heading font-bold text-slate-900 mb-6">Related Tools</h4>
+                    <div class="space-y-4">
+                        {% for other_tool in manifest.categories[0].tools[:5] %}
+                        {% if other_tool.slug != tool.slug %}
+                        <a href="/tools/{{ other_tool.slug }}"
+                            class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 hover:border-brand-500 hover:shadow-lg transition-all group">
+                            <div
+                                class="bg-indigo-50 p-3 rounded-xl text-indigo-500 group-hover:bg-brand-500 group-hover:text-white transition-all">
+                                <i data-lucide="box" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-900 text-sm">{{ other_tool.name }}</h5>
+                                <p class="text-slate-400 text-xs mt-1">Free Utility</p>
+                            </div>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
